@@ -6,6 +6,8 @@ import {
   Cell,
   Line,
   LineChart,
+  Pie,
+  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -16,13 +18,14 @@ import {
   dailyRevenue,
   eur,
   foodCost,
+  ingredientes,
   margen,
   merma,
   mermaSeries,
+  mixVentas,
   objetivo,
   peakHours,
   summary,
-  topCombo,
   topProduct,
 } from "@/lib/dashboard-data";
 
@@ -100,8 +103,11 @@ function Dashboard() {
         : `Bajo control · ${gap} puntos de desviación`;
 
   const maxPeak = Math.max(...peakHours.map((h) => h.pedidos));
-  const objPct = Math.round((objetivo.actual / objetivo.meta) * 100);
-  const objCumplido = objetivo.actual >= objetivo.meta;
+  const objFacturacion = objetivo.unidadesMeta * objetivo.ticketMedio;
+  const objPctFact = Math.round((objetivo.facturacionActual / objFacturacion) * 100);
+  const objPctUds = Math.round((objetivo.unidadesActuales / objetivo.unidadesMeta) * 100);
+  const objCumplido = objetivo.facturacionActual >= objFacturacion;
+  const objColor = objCumplido ? "var(--color-success)" : "var(--color-brand)";
 
   return (
     <main className="mx-auto max-w-6xl px-4 pb-16 pt-6 sm:px-6">
@@ -243,15 +249,126 @@ function Dashboard() {
                   <span className="text-base font-normal text-muted-foreground">uds / semana</span>
                 </p>
               </Card>
+            </div>
+          </div>
+
+          {/* Ingrediente más vendido por categoría */}
+          <div>
+            <p className="mb-1 text-sm font-semibold">Ingrediente más vendido por categoría</p>
+            <p className="mb-4 text-xs text-muted-foreground">
+              kg consumidos esta semana, ordenados de más a menos
+            </p>
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              {ingredientes.map((cat) => {
+                const maxKg = Math.max(...cat.items.map((i) => i.kg));
+                return (
+                  <Card key={cat.categoria}>
+                    <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-brand-soft">
+                      {cat.categoria}
+                    </p>
+                    <div className="space-y-3">
+                      {cat.items.map((item) => (
+                        <div key={item.nombre}>
+                          <div className="mb-1 flex items-baseline justify-between gap-2">
+                            <span className="text-xs">{item.nombre}</span>
+                            <span className="text-xs font-semibold tabular-nums text-muted-foreground">
+                              {item.kg.toString().replace(".", ",")} kg
+                            </span>
+                          </div>
+                          <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+                            <div
+                              className="h-full rounded-full"
+                              style={{
+                                width: `${(item.kg / maxKg) * 100}%`,
+                                background:
+                                  item.kg === maxKg
+                                    ? "var(--color-brand)"
+                                    : "var(--color-brand-soft)",
+                              }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Mix de ventas por formato */}
+          <div>
+            <p className="mb-1 text-sm font-semibold">Mix de ventas por formato</p>
+            <p className="mb-4 text-xs text-muted-foreground">
+              Los packs cuentan como 1 venta pero incluyen 4 o 6 tartas
+            </p>
+            <div className="grid gap-4 lg:grid-cols-2">
               <Card>
-                <p className="text-xs font-semibold uppercase tracking-widest text-brand-soft">
-                  Combinación más vendida
-                </p>
-                <p className="mt-3 text-xl font-semibold">{topCombo.nombre}</p>
-                <p className="num-xl mt-4 text-4xl">
-                  {topCombo.unidades}{" "}
-                  <span className="text-base font-normal text-muted-foreground">uds / semana</span>
-                </p>
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground">
+                      <th className="pb-2 font-medium">Formato</th>
+                      <th className="pb-2 text-right font-medium">Unidades</th>
+                      <th className="pb-2 text-right font-medium">% total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mixVentas.map((f) => (
+                      <tr key={f.formato} className="border-t border-border">
+                        <td className="py-3">{f.formato}</td>
+                        <td className="py-3 text-right tabular-nums text-muted-foreground">
+                          {f.unidades}
+                          {f.tartas !== f.unidades && (
+                            <span className="block text-xs">(= {f.tartas} tartas)</span>
+                          )}
+                        </td>
+                        <td className="py-3 text-right font-semibold tabular-nums">
+                          {f.pct.toString().replace(".", ",")}%
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Card>
+              <Card>
+                <div className="h-64 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Tooltip
+                        {...tooltipStyle}
+                        formatter={(v: number, name: string) => [`${v} uds`, name]}
+                      />
+                      <Pie
+                        data={mixVentas}
+                        dataKey="unidades"
+                        nameKey="formato"
+                        innerRadius={60}
+                        outerRadius={100}
+                        strokeWidth={2}
+                        stroke="var(--color-card)"
+                      >
+                        {mixVentas.map((f, i) => (
+                          <Cell key={f.formato} fill={`var(--color-chart-${(i % 6) + 1})`} />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2">
+                  {mixVentas.map((f, i) => (
+                    <span
+                      key={f.formato}
+                      className="flex items-center gap-2 text-xs text-muted-foreground"
+                    >
+                      <span
+                        className="h-2 w-4 rounded-full"
+                        style={{ background: `var(--color-chart-${(i % 6) + 1})` }}
+                        aria-hidden
+                      />
+                      {f.formato} · {f.pct.toString().replace(".", ",")}%
+                    </span>
+                  ))}
+                </div>
               </Card>
             </div>
           </div>
@@ -401,28 +518,55 @@ function Dashboard() {
           <Card>
             <p className="mb-1 text-sm font-semibold">Objetivo semanal (break even)</p>
             <p className="mb-5 text-xs text-muted-foreground">
-              500 uds / semana ≈ {eur(objetivo.meta * objetivo.precioBase)} · precio base{" "}
-              {eur(objetivo.precioBase, 2)}
+              {objetivo.unidadesMeta} uds × ticket medio real {eur(objetivo.ticketMedio, 2)} ={" "}
+              {eur(objFacturacion)}
             </p>
-            <div className="flex items-end justify-between">
-              <p className="num-xl text-5xl">{objetivo.actual}</p>
-              <p className="text-sm text-muted-foreground">de {objetivo.meta} uds</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="num-xl text-4xl">{eur(objetivo.facturacionActual)}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Facturación de {eur(objFacturacion)}
+                </p>
+              </div>
+              <div>
+                <p className="num-xl text-4xl">{objetivo.unidadesActuales}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Unidades de {objetivo.unidadesMeta}
+                </p>
+              </div>
             </div>
-            <div className="mt-4 h-4 w-full overflow-hidden rounded-full bg-secondary">
-              <div
-                className="h-full rounded-full transition-all"
-                style={{
-                  width: `${Math.min(objPct, 100)}%`,
-                  background: objCumplido ? "var(--color-success)" : "var(--color-brand)",
-                }}
-              />
+            <div className="mt-5 space-y-3">
+              <div>
+                <div className="mb-1 flex justify-between text-xs text-muted-foreground">
+                  <span>Facturación</span>
+                  <span className="tabular-nums">{objPctFact}%</span>
+                </div>
+                <div className="h-3 w-full overflow-hidden rounded-full bg-secondary">
+                  <div
+                    className="h-full rounded-full transition-all"
+                    style={{ width: `${Math.min(objPctFact, 100)}%`, background: objColor }}
+                  />
+                </div>
+              </div>
+              <div>
+                <div className="mb-1 flex justify-between text-xs text-muted-foreground">
+                  <span>Unidades</span>
+                  <span className="tabular-nums">{objPctUds}%</span>
+                </div>
+                <div className="h-3 w-full overflow-hidden rounded-full bg-secondary">
+                  <div
+                    className="h-full rounded-full transition-all"
+                    style={{ width: `${Math.min(objPctUds, 100)}%`, background: objColor }}
+                  />
+                </div>
+              </div>
             </div>
             <p
-              className={`mt-3 text-sm font-semibold ${objCumplido ? "text-success" : "text-brand"}`}
+              className={`mt-4 text-sm font-semibold ${objCumplido ? "text-success" : "text-brand"}`}
             >
               {objCumplido
-                ? `Objetivo superado · ${objetivo.actual - objetivo.meta} uds por encima`
-                : `${objPct}% completado · faltan ${objetivo.meta - objetivo.actual} uds`}
+                ? `Objetivo superado · ${eur(objetivo.facturacionActual - objFacturacion)} por encima`
+                : `Faltan ${eur(objFacturacion - objetivo.facturacionActual)} y ${objetivo.unidadesMeta - objetivo.unidadesActuales} uds · quedan sábado y domingo, buen ritmo`}
             </p>
           </Card>
         </div>

@@ -41,10 +41,53 @@ export const topProduct = {
   unidades: 142,
 };
 
-export const topCombo = {
-  nombre: "Crema vainilla + Ganache café",
-  unidades: 67,
-};
+export const ingredientes = [
+  {
+    categoria: "Cremas",
+    items: [
+      { nombre: "Crema vainilla", kg: 18.4 },
+      { nombre: "Crema coulant chocolate", kg: 14.2 },
+      { nombre: "Crema lemon curd", kg: 11.6 },
+      { nombre: "Crema NY cheesecake", kg: 10.1 },
+      { nombre: "Crema basque cheesecake", kg: 7.3 },
+    ],
+  },
+  {
+    categoria: "Mermeladas",
+    items: [
+      { nombre: "Fresa", kg: 4.2 },
+      { nombre: "Frambuesa", kg: 3.1 },
+      { nombre: "Mango", kg: 2.4 },
+      { nombre: "Maracuyá", kg: 1.8 },
+    ],
+  },
+  {
+    categoria: "Cremas de frutos secos",
+    items: [
+      { nombre: "Crema de pistacho", kg: 3.8 },
+      { nombre: "Crema de avellana", kg: 3.2 },
+      { nombre: "Crema de nuez", kg: 2.9 },
+      { nombre: "Crema de almendra", kg: 2.1 },
+      { nombre: "Crema de pecana", kg: 1.4 },
+    ],
+  },
+  {
+    categoria: "Ganaches",
+    items: [
+      { nombre: "Ganache de café", kg: 5.6 },
+      { nombre: "Ganache de matcha", kg: 4.3 },
+      { nombre: "Ganache de frutas", kg: 3.9 },
+    ],
+  },
+];
+
+export const mixVentas = [
+  { formato: "Tarta abierta pequeña", unidades: 187, pct: 59.9, tartas: 187 },
+  { formato: "Cake shake", unidades: 68, pct: 21.8, tartas: 68 },
+  { formato: "Tarta en lata pequeña", unidades: 38, pct: 12.2, tartas: 38 },
+  { formato: "Pack de 4 tartas en lata", unidades: 5, pct: 1.6, tartas: 20 },
+  { formato: "Pack de 6 tartas en lata", unidades: 4, pct: 1.3, tartas: 24 },
+];
 
 export const foodCost = { teorico: 28, real: 31 };
 
@@ -80,7 +123,12 @@ export const comparativa = [
   { metrica: "Food cost real", anterior: "32 %", actual: "31 %", diff: -1, unidad: "pt", good: true },
 ];
 
-export const objetivo = { actual: 312, meta: 500, precioBase: 4.9 };
+export const objetivo = {
+  unidadesMeta: 500,
+  unidadesActuales: 312,
+  facturacionActual: summary.semana.facturacion,
+  ticketMedio: summary.semana.ticket,
+};
 
 export const eur = (n: number, decimals = 0) =>
   new Intl.NumberFormat("es-ES", {
