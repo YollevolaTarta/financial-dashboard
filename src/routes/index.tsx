@@ -103,8 +103,11 @@ function Dashboard() {
         : `Bajo control · ${gap} puntos de desviación`;
 
   const maxPeak = Math.max(...peakHours.map((h) => h.pedidos));
-  const objPct = Math.round((objetivo.actual / objetivo.meta) * 100);
-  const objCumplido = objetivo.actual >= objetivo.meta;
+  const objFacturacion = objetivo.unidadesMeta * objetivo.ticketMedio;
+  const objPctFact = Math.round((objetivo.facturacionActual / objFacturacion) * 100);
+  const objPctUds = Math.round((objetivo.unidadesActuales / objetivo.unidadesMeta) * 100);
+  const objCumplido = objetivo.facturacionActual >= objFacturacion;
+  const objColor = objCumplido ? "var(--color-success)" : "var(--color-brand)";
 
   return (
     <main className="mx-auto max-w-6xl px-4 pb-16 pt-6 sm:px-6">
@@ -515,28 +518,55 @@ function Dashboard() {
           <Card>
             <p className="mb-1 text-sm font-semibold">Objetivo semanal (break even)</p>
             <p className="mb-5 text-xs text-muted-foreground">
-              500 uds / semana ≈ {eur(objetivo.meta * objetivo.precioBase)} · precio base{" "}
-              {eur(objetivo.precioBase, 2)}
+              {objetivo.unidadesMeta} uds × ticket medio real {eur(objetivo.ticketMedio, 2)} ={" "}
+              {eur(objFacturacion)}
             </p>
-            <div className="flex items-end justify-between">
-              <p className="num-xl text-5xl">{objetivo.actual}</p>
-              <p className="text-sm text-muted-foreground">de {objetivo.meta} uds</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="num-xl text-4xl">{eur(objetivo.facturacionActual)}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Facturación de {eur(objFacturacion)}
+                </p>
+              </div>
+              <div>
+                <p className="num-xl text-4xl">{objetivo.unidadesActuales}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Unidades de {objetivo.unidadesMeta}
+                </p>
+              </div>
             </div>
-            <div className="mt-4 h-4 w-full overflow-hidden rounded-full bg-secondary">
-              <div
-                className="h-full rounded-full transition-all"
-                style={{
-                  width: `${Math.min(objPct, 100)}%`,
-                  background: objCumplido ? "var(--color-success)" : "var(--color-brand)",
-                }}
-              />
+            <div className="mt-5 space-y-3">
+              <div>
+                <div className="mb-1 flex justify-between text-xs text-muted-foreground">
+                  <span>Facturación</span>
+                  <span className="tabular-nums">{objPctFact}%</span>
+                </div>
+                <div className="h-3 w-full overflow-hidden rounded-full bg-secondary">
+                  <div
+                    className="h-full rounded-full transition-all"
+                    style={{ width: `${Math.min(objPctFact, 100)}%`, background: objColor }}
+                  />
+                </div>
+              </div>
+              <div>
+                <div className="mb-1 flex justify-between text-xs text-muted-foreground">
+                  <span>Unidades</span>
+                  <span className="tabular-nums">{objPctUds}%</span>
+                </div>
+                <div className="h-3 w-full overflow-hidden rounded-full bg-secondary">
+                  <div
+                    className="h-full rounded-full transition-all"
+                    style={{ width: `${Math.min(objPctUds, 100)}%`, background: objColor }}
+                  />
+                </div>
+              </div>
             </div>
             <p
-              className={`mt-3 text-sm font-semibold ${objCumplido ? "text-success" : "text-brand"}`}
+              className={`mt-4 text-sm font-semibold ${objCumplido ? "text-success" : "text-brand"}`}
             >
               {objCumplido
-                ? `Objetivo superado · ${objetivo.actual - objetivo.meta} uds por encima`
-                : `${objPct}% completado · faltan ${objetivo.meta - objetivo.actual} uds`}
+                ? `Objetivo superado · ${eur(objetivo.facturacionActual - objFacturacion)} por encima`
+                : `Faltan ${eur(objFacturacion - objetivo.facturacionActual)} y ${objetivo.unidadesMeta - objetivo.unidadesActuales} uds · quedan sábado y domingo, buen ritmo`}
             </p>
           </Card>
         </div>
