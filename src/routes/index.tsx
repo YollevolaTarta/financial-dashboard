@@ -16,13 +16,14 @@ import {
   dailyRevenue,
   eur,
   foodCost,
+  ingredientes,
   margen,
   merma,
   mermaSeries,
+  mixVentas,
   objetivo,
   peakHours,
   summary,
-  topCombo,
   topProduct,
 } from "@/lib/dashboard-data";
 
