@@ -6,6 +6,8 @@ import {
   Cell,
   Line,
   LineChart,
+  Pie,
+  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -244,15 +246,126 @@ function Dashboard() {
                   <span className="text-base font-normal text-muted-foreground">uds / semana</span>
                 </p>
               </Card>
+            </div>
+          </div>
+
+          {/* Ingrediente más vendido por categoría */}
+          <div>
+            <p className="mb-1 text-sm font-semibold">Ingrediente más vendido por categoría</p>
+            <p className="mb-4 text-xs text-muted-foreground">
+              kg consumidos esta semana, ordenados de más a menos
+            </p>
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              {ingredientes.map((cat) => {
+                const maxKg = Math.max(...cat.items.map((i) => i.kg));
+                return (
+                  <Card key={cat.categoria}>
+                    <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-brand-soft">
+                      {cat.categoria}
+                    </p>
+                    <div className="space-y-3">
+                      {cat.items.map((item) => (
+                        <div key={item.nombre}>
+                          <div className="mb-1 flex items-baseline justify-between gap-2">
+                            <span className="text-xs">{item.nombre}</span>
+                            <span className="text-xs font-semibold tabular-nums text-muted-foreground">
+                              {item.kg.toString().replace(".", ",")} kg
+                            </span>
+                          </div>
+                          <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+                            <div
+                              className="h-full rounded-full"
+                              style={{
+                                width: `${(item.kg / maxKg) * 100}%`,
+                                background:
+                                  item.kg === maxKg
+                                    ? "var(--color-brand)"
+                                    : "var(--color-brand-soft)",
+                              }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Mix de ventas por formato */}
+          <div>
+            <p className="mb-1 text-sm font-semibold">Mix de ventas por formato</p>
+            <p className="mb-4 text-xs text-muted-foreground">
+              Los packs cuentan como 1 venta pero incluyen 4 o 6 tartas
+            </p>
+            <div className="grid gap-4 lg:grid-cols-2">
               <Card>
-                <p className="text-xs font-semibold uppercase tracking-widest text-brand-soft">
-                  Combinación más vendida
-                </p>
-                <p className="mt-3 text-xl font-semibold">{topCombo.nombre}</p>
-                <p className="num-xl mt-4 text-4xl">
-                  {topCombo.unidades}{" "}
-                  <span className="text-base font-normal text-muted-foreground">uds / semana</span>
-                </p>
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground">
+                      <th className="pb-2 font-medium">Formato</th>
+                      <th className="pb-2 text-right font-medium">Unidades</th>
+                      <th className="pb-2 text-right font-medium">% total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mixVentas.map((f) => (
+                      <tr key={f.formato} className="border-t border-border">
+                        <td className="py-3">{f.formato}</td>
+                        <td className="py-3 text-right tabular-nums text-muted-foreground">
+                          {f.unidades}
+                          {f.tartas !== f.unidades && (
+                            <span className="block text-xs">(= {f.tartas} tartas)</span>
+                          )}
+                        </td>
+                        <td className="py-3 text-right font-semibold tabular-nums">
+                          {f.pct.toString().replace(".", ",")}%
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Card>
+              <Card>
+                <div className="h-64 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Tooltip
+                        {...tooltipStyle}
+                        formatter={(v: number, name: string) => [`${v} uds`, name]}
+                      />
+                      <Pie
+                        data={mixVentas}
+                        dataKey="unidades"
+                        nameKey="formato"
+                        innerRadius={60}
+                        outerRadius={100}
+                        strokeWidth={2}
+                        stroke="var(--color-card)"
+                      >
+                        {mixVentas.map((f, i) => (
+                          <Cell key={f.formato} fill={`var(--color-chart-${(i % 6) + 1})`} />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2">
+                  {mixVentas.map((f, i) => (
+                    <span
+                      key={f.formato}
+                      className="flex items-center gap-2 text-xs text-muted-foreground"
+                    >
+                      <span
+                        className="h-2 w-4 rounded-full"
+                        style={{ background: `var(--color-chart-${(i % 6) + 1})` }}
+                        aria-hidden
+                      />
+                      {f.formato} · {f.pct.toString().replace(".", ",")}%
+                    </span>
+                  ))}
+                </div>
               </Card>
             </div>
           </div>
