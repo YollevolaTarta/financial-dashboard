@@ -396,7 +396,7 @@ function Merma({ d }: { d: GestionData }) {
   const hasData = semanas.some((s) => (s.merma_kg ?? 0) > 0);
   const names = ["Total", ...elabs.map((e) => e.nombre)];
   return (
-    <Card className="lg:col-span-2">
+    <Card>
       <CardTitle title="Merma · últimas 8 semanas" note="% de merma por semana (lunes). Total destacado y las 5 elaboraciones con más kg tirados." />
       {!hasData ? (
         <Empty>Sin merma registrada</Empty>
@@ -711,9 +711,7 @@ export function Dashboard({ d, store }: { d: GestionData; store: string | null }
           </Card>
           <FoodCostReal d={d} store={store} />
         </div>
-        <div className="grid gap-4 lg:grid-cols-3">
-          <Merma d={d} />
-        </div>
+        <Merma d={d} />
       </Section>
 
       <Section n="04" title="Comparativa y objetivo">
