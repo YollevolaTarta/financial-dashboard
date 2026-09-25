@@ -134,7 +134,7 @@ function Diario({ d }: { d: GestionData }) {
                   contentStyle={tooltipStyle}
                   content={({ active, payload }) => {
                     if (!active || !payload?.length) return null;
-                    const r = payload[0].payload as (typeof rows)[number];
+                    const r = payload[0]!.payload as (typeof rows)[number];
                     return (
                       <div style={tooltipStyle} className="px-3 py-2">
                         <p className="font-medium">{r.x}</p>
@@ -411,7 +411,7 @@ function Merma({ d }: { d: GestionData }) {
                 <Tooltip
                   content={({ active, payload, label }) => {
                     if (!active || !payload?.length) return null;
-                    const r = payload[0].payload as Record<string, number | null>;
+                    const r = payload[0]!.payload as Record<string, number | null>;
                     const line = (key: string, name: string) => {
                       const p = r[key];
                       const kg = r[`${key}_kg`];
