@@ -55,7 +55,7 @@ function Index() {
     );
   }
   if (!session) return <Login />;
-  if (session.user.app_metadata?.rol !== "admin") {
+  if (session.user.app_metadata?.["rol"] !== "admin") {
     return (
       <div className="flex min-h-screen items-center justify-center px-4">
         <div className="max-w-sm rounded-2xl border bg-card p-8 text-center">
