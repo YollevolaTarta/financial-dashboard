@@ -21,7 +21,7 @@ import type { GestionData, Periodo, RankingItem } from "./types";
 
 /* ---------- piezas base ---------- */
 
-function Card({ children, className }: { children: ReactNode; className?: string }) {
+function Card({ children, className }: { children: ReactNode; className?: string | undefined }) {
   return <div className={cn("rounded-2xl border bg-card p-5 sm:p-6", className)}>{children}</div>;
 }
 
@@ -75,7 +75,7 @@ const diffPct = (a: number | null | undefined, b: number | null | undefined) =>
 
 /* ---------- 01 Resumen ---------- */
 
-function ResumenCard({ label, p, main }: { label: string; p?: Periodo; main?: boolean }) {
+function ResumenCard({ label, p, main }: { label: string; p?: Periodo | undefined; main?: boolean }) {
   return (
     <Card className={cn(main && "ring-2 ring-brand/60")}>
       <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
@@ -199,7 +199,7 @@ function Horas({ d }: { d: GestionData }) {
   );
 }
 
-function RankingCard({ title, items }: { title: string; items?: RankingItem[] }) {
+function RankingCard({ title, items }: { title: string; items?: RankingItem[] | undefined }) {
   const list = [...(items ?? [])].sort((a, b) => {
     const za = (a.unidades ?? 0) === 0 ? 1 : 0;
     const zb = (b.unidades ?? 0) === 0 ? 1 : 0;
@@ -505,7 +505,7 @@ function Comparativa({ d }: { d: GestionData }) {
   );
 }
 
-function Objetivo({ d, className }: { d: GestionData; className?: string }) {
+function Objetivo({ d, className }: { d: GestionData; className?: string | undefined }) {
   const o = d.objetivo;
   const pT = isNum(o?.tartas) && isNum(o?.objetivo_tartas) && o.objetivo_tartas > 0 ? (o.tartas / o.objetivo_tartas) * 100 : 0;
   const pF =
