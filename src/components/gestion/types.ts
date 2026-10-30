@@ -79,13 +79,13 @@ export interface GestionData {
       serie?: string | null;
       numero_pedido?: string | number | null;
       tienda?: string | null;
-      tipo?: string | null;
+      tipo_pedido?: string | null;
       contenido?: string | null;
       veces?: N;
       estaciones?: string | string[] | null;
       estacion?: string | string[] | null;
       minutos_perdidos?: N;
-      coste?: N;
+      coste_rehacer?: N;
     }[];
   };
 }
