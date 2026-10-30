@@ -591,7 +591,7 @@ function Rehechos({ d, store }: { d: GestionData; store: string | null }) {
                         <span className="text-xs tabular-nums text-muted-foreground">{hhmm(x.fecha)}</span>
                       </div>
                       <p className="mt-1 text-xs text-muted-foreground">
-                        {x.tienda ?? "—"} · {x.tipo ? (TIPO[x.tipo] ?? x.tipo) : "—"}
+                        {x.tienda ?? "—"} · {x.tipo_pedido ? (TIPO[x.tipo_pedido] ?? x.tipo_pedido) : "—"}
                       </p>
                       {x.contenido && <p className="mt-2">{x.contenido}</p>}
                       <div className="mt-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
@@ -609,7 +609,7 @@ function Rehechos({ d, store }: { d: GestionData; store: string | null }) {
                         </div>
                         <div>
                           <p className="text-muted-foreground">Coste</p>
-                          <p className="font-medium tabular-nums">{eur(x.coste, 2)}</p>
+                          <p className="font-medium tabular-nums">{eur(x.coste_rehacer, 2)}</p>
                         </div>
                       </div>
                     </li>
