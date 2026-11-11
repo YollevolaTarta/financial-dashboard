@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { getSupabase } from "@/lib/supabase";
 import { Login } from "@/components/gestion/Login";
 import { Dashboard, semaforo } from "@/components/gestion/Dashboard";
+import { Campana } from "@/components/gestion/Campana";
 import { eur, num, pct, isNum } from "@/components/gestion/format";
 import type { GestionData } from "@/components/gestion/types";
 import { cn } from "@/lib/utils";
@@ -175,6 +176,7 @@ function Panel({ onSignOut, userId }: { onSignOut: () => void; userId: string })
             )}
             <Highlights d={q.data} />
             <Dashboard d={q.data} store={validStore} />
+            <Campana userId={userId} />
           </>
         )}
       </main>
