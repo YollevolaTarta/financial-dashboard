@@ -63,7 +63,7 @@ function madrid(s: string | null | undefined, conAnio: boolean) {
   if (!s) return DASH;
   const d = new Date(s);
   if (isNaN(d.getTime())) return DASH;
-  const p = Object.fromEntries(
+  const p: Record<string, string> = Object.fromEntries(
     new Intl.DateTimeFormat("es-ES", {
       timeZone: TZ,
       day: "2-digit",
@@ -76,7 +76,10 @@ function madrid(s: string | null | undefined, conAnio: boolean) {
       .formatToParts(d)
       .map((x) => [x.type, x.value]),
   );
-  return conAnio ? `${p.day}/${p.month}/${p.year} ${p.hour}:${p.minute}` : `${p.day}/${p.month} ${p.hour}:${p.minute}`;
+  const g = (k: string) => p[k] ?? "";
+  return conAnio
+    ? `${g("day")}/${g("month")}/${g("year")} ${g("hour")}:${g("minute")}`
+    : `${g("day")}/${g("month")} ${g("hour")}:${g("minute")}`;
 }
 
 const dec = (n: N) => (isNum(n) ? num(n, 2) : "");
