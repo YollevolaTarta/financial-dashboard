@@ -1,7 +1,7 @@
 const DASH = "—";
 const isNum = (n: unknown): n is number => typeof n === "number" && Number.isFinite(n);
 
-export const eur = (n: number | null | undefined, decimals = 0) =>
+export const eur = (n: number | null | undefined, decimals = 2) =>
   isNum(n)
     ? new Intl.NumberFormat("es-ES", {
         style: "currency",

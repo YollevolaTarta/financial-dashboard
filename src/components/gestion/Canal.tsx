@@ -130,7 +130,7 @@ export function Canal({ userId, canal, titulo, activo }: { userId: string; canal
     <div className="space-y-12">
       <div>
         <h1 className="text-xl font-semibold tracking-tight">{titulo}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Pedidos pagados del canal; no depende de la tienda seleccionada</p>
+        <p className="mt-1 text-sm text-muted-foreground">Pedidos pagados del canal</p>
       </div>
 
       {q.isError && (
