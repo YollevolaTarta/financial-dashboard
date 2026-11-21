@@ -21,11 +21,11 @@ import type { GestionData, Periodo, RankingItem } from "./types";
 
 /* ---------- piezas base ---------- */
 
-function Card({ children, className }: { children: ReactNode; className?: string | undefined }) {
+export function Card({ children, className }: { children: ReactNode; className?: string | undefined }) {
   return <div className={cn("rounded-2xl border bg-card p-5 sm:p-6", className)}>{children}</div>;
 }
 
-function CardTitle({ title, note }: { title: string; note?: string }) {
+export function CardTitle({ title, note }: { title: string; note?: string }) {
   return (
     <div className="mb-4">
       <h3 className="text-sm font-semibold tracking-tight">{title}</h3>
@@ -34,7 +34,7 @@ function CardTitle({ title, note }: { title: string; note?: string }) {
   );
 }
 
-function Section({ n, title, children }: { n: string; title: string; children: ReactNode }) {
+export function Section({ n, title, children }: { n: string; title: string; children: ReactNode }) {
   return (
     <section className="space-y-4">
       <div className="flex items-baseline gap-3">
@@ -46,7 +46,7 @@ function Section({ n, title, children }: { n: string; title: string; children: R
   );
 }
 
-function Empty({ children }: { children: ReactNode }) {
+export function Empty({ children }: { children: ReactNode }) {
   return <p className="py-8 text-center text-sm text-muted-foreground">{children}</p>;
 }
 
@@ -75,7 +75,7 @@ const diffPct = (a: number | null | undefined, b: number | null | undefined) =>
 
 /* ---------- 01 Resumen ---------- */
 
-function ResumenCard({ label, p, main }: { label: string; p?: Periodo | undefined; main?: boolean }) {
+export function ResumenCard({ label, p, main, ocultarIva = false }: { label: string; p?: Periodo | undefined; main?: boolean; ocultarIva?: boolean }) {
   return (
     <Card className={cn(main && "ring-2 ring-brand/60")}>
       <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
@@ -102,18 +102,19 @@ function ResumenCard({ label, p, main }: { label: string; p?: Periodo | undefine
           <dd className="text-[11px] tabular-nums text-muted-foreground">{eur(p?.ticket_medio_sin_iva, 2)} sin IVA</dd>
         </div>
       </dl>
-      <p className="mt-4 border-t pt-3 text-xs tabular-nums text-muted-foreground">IVA repercutido: {eur(p?.iva)}</p>
+      {!ocultarIva && <p className="mt-4 border-t pt-3 text-xs tabular-nums text-muted-foreground">IVA repercutido: {eur(p?.iva)}</p>}
     </Card>
   );
 }
 
 /* ---------- 02 Ventas ---------- */
 
-function Diario({ d }: { d: GestionData }) {
+export function Diario({ d, todosAbiertos = false }: { d: GestionData; todosAbiertos?: boolean }) {
   const rows = (d.diario ?? []).map((r, i, arr) => ({
     ...r,
+    abierto: todosAbiertos || r.abierto,
     x: `${DIAS[r.dia_semana] ?? ""} ${ddmm(r.fecha)}`,
-    valor: r.abierto ? (r.facturacion ?? 0) : 0,
+    valor: todosAbiertos || r.abierto ? (r.facturacion ?? 0) : 0,
     hoy: i === arr.length - 1,
   }));
   return (
@@ -199,7 +200,7 @@ function Horas({ d }: { d: GestionData }) {
   );
 }
 
-function RankingCard({ title, items }: { title: string; items?: RankingItem[] | undefined }) {
+export function RankingCard({ title, items }: { title: string; items?: RankingItem[] | undefined }) {
   const list = [...(items ?? [])].sort((a, b) => {
     const za = (a.unidades ?? 0) === 0 ? 1 : 0;
     const zb = (b.unidades ?? 0) === 0 ? 1 : 0;
@@ -238,7 +239,7 @@ function RankingCard({ title, items }: { title: string; items?: RankingItem[] | 
 
 const DONUT = ["var(--color-chart-1)", "var(--color-chart-2)", "var(--color-chart-3)", "var(--color-chart-4)", "var(--color-chart-5)", "var(--color-chart-6)"];
 
-function Mix({ d }: { d: GestionData }) {
+export function Mix({ d }: { d: GestionData }) {
   const rows = d.mix ?? [];
   return (
     <Card>

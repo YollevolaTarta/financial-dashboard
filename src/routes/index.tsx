@@ -9,6 +9,8 @@ import { getSupabase } from "@/lib/supabase";
 import { Login } from "@/components/gestion/Login";
 import { Dashboard, semaforo } from "@/components/gestion/Dashboard";
 import { Campana } from "@/components/gestion/Campana";
+import { Canal } from "@/components/gestion/Canal";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { eur, num, pct, isNum } from "@/components/gestion/format";
 import type { GestionData } from "@/components/gestion/types";
 import { cn } from "@/lib/utils";
@@ -75,6 +77,7 @@ function Index() {
 function Panel({ onSignOut, userId }: { onSignOut: () => void; userId: string }) {
   const [store, setStore] = useState<string | null>(null);
   const [storeReady, setStoreReady] = useState(false);
+  const [tab, setTab] = useState("global");
 
   useEffect(() => {
     try {
@@ -155,6 +158,13 @@ function Panel({ onSignOut, userId }: { onSignOut: () => void; userId: string })
       </header>
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+        <Tabs value={tab} onValueChange={setTab}>
+          <TabsList className="mb-8">
+            <TabsTrigger value="global">Global</TabsTrigger>
+            <TabsTrigger value="tienda">Tienda Bilbao</TabsTrigger>
+            <TabsTrigger value="envios">Envíos en frío</TabsTrigger>
+          </TabsList>
+          <TabsContent value="global">
         {q.isError && !q.data ? (
           <div className="mx-auto max-w-sm rounded-2xl border bg-card p-8 text-center">
             <p className="text-sm font-medium">No se han podido cargar los datos.</p>
@@ -179,6 +189,14 @@ function Panel({ onSignOut, userId }: { onSignOut: () => void; userId: string })
             <Campana userId={userId} />
           </>
         )}
+          </TabsContent>
+          <TabsContent value="tienda">
+            <Canal userId={userId} canal="tienda" titulo="Tienda Bilbao" activo={tab === "tienda"} />
+          </TabsContent>
+          <TabsContent value="envios">
+            <Canal userId={userId} canal="envios" titulo="Envíos en frío" activo={tab === "envios"} />
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
