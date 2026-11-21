@@ -209,7 +209,7 @@ export function Canal({ userId, canal, titulo, activo }: { userId: string; canal
               <Fila l="− Food cost del canal" v={eur(p?.coste_canal)} />
               <Fila
                 l="− Coste de envío (SEUR + caja y acumuladores × expediciones)"
-                extra={`${num(p?.expediciones)} expediciones`}
+                extra={`${num(p?.expediciones)} ${p?.expediciones === 1 ? "expedición" : "expediciones"}`}
                 v={eur(p?.coste_envio)}
               />
               <div className="flex flex-wrap items-baseline justify-between gap-2 pt-3">

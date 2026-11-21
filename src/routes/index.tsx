@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getSupabase } from "@/lib/supabase";
 import { Login } from "@/components/gestion/Login";
 import { Dashboard, semaforo } from "@/components/gestion/Dashboard";
@@ -28,9 +27,6 @@ export const Route = createFileRoute("/")({
   }),
   component: Index,
 });
-
-const STORE_KEY = "yllt_gestion_tienda";
-const ALL = "__all__";
 
 function Index() {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
@@ -75,48 +71,30 @@ function Index() {
 }
 
 function Panel({ onSignOut, userId }: { onSignOut: () => void; userId: string }) {
-  const [store, setStore] = useState<string | null>(null);
-  const [storeReady, setStoreReady] = useState(false);
   const [tab, setTab] = useState("global");
 
   useEffect(() => {
     try {
-      const v = window.localStorage.getItem(STORE_KEY);
-      if (v) setStore(v);
+      window.localStorage.removeItem("yllt_gestion_tienda");
     } catch {
       /* ignorar */
     }
-    setStoreReady(true);
   }, []);
 
-  function changeStore(v: string) {
-    const next = v === ALL ? null : v;
-    setStore(next);
-    try {
-      if (next) window.localStorage.setItem(STORE_KEY, next);
-      else window.localStorage.removeItem(STORE_KEY);
-    } catch {
-      /* ignorar */
-    }
-  }
-
   const q = useQuery({
-    queryKey: ["gestion_dashboard", userId, store],
-    enabled: storeReady,
+    queryKey: ["gestion_dashboard", userId],
     refetchInterval: 60_000,
     refetchOnWindowFocus: true,
     placeholderData: (prev) => prev,
     queryFn: async () => {
       const sb = getSupabase();
       if (!sb) throw new Error("Sin conexión");
-      const { data, error } = await sb.rpc("gestion_dashboard", { p_store: store });
+      const { data, error } = await sb.rpc("gestion_dashboard", { p_store: null });
       if (error) throw error;
       return (data ?? {}) as GestionData;
     },
   });
 
-  const tiendas = q.data?.tiendas ?? [];
-  const validStore = store && (tiendas.length === 0 || tiendas.some((t) => t.id === store)) ? store : null;
   const updated = q.dataUpdatedAt
     ? new Date(q.dataUpdatedAt).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })
     : null;
@@ -132,19 +110,6 @@ function Panel({ onSignOut, userId }: { onSignOut: () => void; userId: string })
             </span>
           </div>
           <div className="ml-auto flex flex-wrap items-center gap-3">
-            <Select value={validStore ?? ALL} onValueChange={changeStore}>
-              <SelectTrigger className="h-9 w-[190px]">
-                <SelectValue placeholder="Todas las tiendas" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={ALL}>Todas las tiendas</SelectItem>
-                {tiendas.map((t) => (
-                  <SelectItem key={t.id} value={t.id}>
-                    {t.nombre}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
             {updated && (
               <span className="hidden text-xs tabular-nums text-muted-foreground sm:inline">
                 {q.isFetching ? "Actualizando…" : `Actualizado ${updated}`}
@@ -185,7 +150,7 @@ function Panel({ onSignOut, userId }: { onSignOut: () => void; userId: string })
               </div>
             )}
             <Highlights d={q.data} />
-            <Dashboard d={q.data} store={validStore} />
+            <Dashboard d={q.data} store={null} />
             <Campana userId={userId} />
           </>
         )}
